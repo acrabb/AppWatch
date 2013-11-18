@@ -1,0 +1,8 @@
+| Seconds   |
+| datetime  | app_id    |
+
+| Opens     |
+| datetime  | app_id    |
+
+| Apps      |
+| id        | packageName   |
