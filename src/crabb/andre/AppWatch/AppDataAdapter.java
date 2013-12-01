@@ -3,19 +3,16 @@ package crabb.andre.AppWatch;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.database.DataSetObserver;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,7 +45,6 @@ public class AppDataAdapter extends ArrayAdapter<AppData> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-//        return super.getView(position, convertView, parent);
         View            gridCell;
         ImageView       image;
         TextView        text;
@@ -70,7 +66,8 @@ public class AppDataAdapter extends ArrayAdapter<AppData> {
         try {
             info = pm.getApplicationInfo(app.getPackageName(), PackageManager.GET_META_DATA);
             text.setText(pm.getApplicationLabel(info).toString());
-            time.setText(String.format("%d", app.getSecondsSpent()));
+            time.setText(Utils.secondsToClockTimeString(app.getSeconds()));
+//            time.setText(String.format("%d", app.getSeconds()));
             image.setImageDrawable(pm.getApplicationIcon(info));
         } catch (PackageManager.NameNotFoundException e) {
             Log.d(TAG, "!> NameNotFound :(");

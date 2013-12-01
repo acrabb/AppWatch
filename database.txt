@@ -1,0 +1,5 @@
+Table Seconds
+| timestamp | app_id    | numSeconds    |
+
+Table Apps
+| id        | packageName   |

@@ -1,5 +1,7 @@
 package crabb.andre.AppWatch;
 
+import android.app.Application;
+import android.content.pm.ApplicationInfo;
 import android.util.Log;
 
 /**
@@ -11,50 +13,24 @@ import android.util.Log;
  */
 public class AppData implements Comparable {
     /*
-        How long did I spend on Facebook today? This week?
-        How many times did I open Facebook today?
+        This represents one row in the database table.
+        PackageName | timestamp | numSeconds | id
      */
 
-    private String  mPackageName;
-    private int     mTimesOpened;
-    private int     mSecondsTotal;
-    private int     mSeconds;
-    private int     mMinutes;
-    private int     mHours;
-    private int     mDays;
+    private long        mId;
+    private long        mTimestamp;
+    private String      mPackageName;
+    private long         mSeconds;
+
 
     final String    TAG = "ACAC-AppData";
 
     // -- Contructors ---------------------------------------------------------
     // ------------------------------------------------------------------------
-    public AppData (String packageName) {
-        this.mPackageName = packageName;
-        this.mTimesOpened = 0;
-        this.mSeconds = 0;
-    }
-
-    // -- METHODS -------------------------------------------------------------
-    // ------------------------------------------------------------------------
-    public boolean incrementTimesOpened() {
-        return incrementTimesOpened(1);
-    }
-    // ------------------------------------------------------------------------
-    private boolean incrementTimesOpened(int num) {
-        if (num < 0) {
-            Log.d(TAG, "!> Trying to add negative times opened.");
-            return false;
-        }
-        this.mTimesOpened += num;
-        return true;
-    }
-    // ------------------------------------------------------------------------
-    public boolean addSeconds(int seconds) {
-        if (seconds < 0) {
-            Log.d(TAG, "!> Trying to add negative seconds.");
-            return false;
-        }
-        this.mSeconds += seconds;
-        return true;
+    public AppData (String packageName, long timestamp, long seconds) {
+        this.mPackageName   = packageName;
+        this.mTimestamp     = timestamp;
+        this.mSeconds       = seconds;
     }
 
     // -- GETTERS & SETTERS ---------------------------------------------------
@@ -65,18 +41,31 @@ public class AppData implements Comparable {
     public void setPackageName(String packageName) {
         this.mPackageName = packageName;
     }
-    public int getTimesOpened() {
-        return mTimesOpened;
-    }
-    public int getSecondsSpent() {
+    public long getSeconds() {
         return mSeconds;
     }
+    public long getId() {
+        return mId;
+    }
+    public void setId(long mId) {
+        this.mId = mId;
+    }
+    public long getTimestamp() {
+        return mTimestamp;
+    }
+    public void setTimestamp(long mTimestamp) {
+        this.mTimestamp = mTimestamp;
+    }
 
-    // -- Comparable ----------------------------------------------------------
+
+    public String toString() {
+        return mPackageName + " " + mSeconds;
+    }
+
     @Override
     public int compareTo(Object o) {
-        AppData ad = (AppData) o;
-        return (this.mSeconds < ad.getSecondsSpent()) ? -1 :
-                (this.mSeconds == ad.getSecondsSpent() ? 0 : 1);
+        AppData other = (AppData) o;
+        return (this.mTimestamp < other.getTimestamp()) ? -1 :
+                (this.mTimestamp == other.getTimestamp() ? 0 : 1);
     }
 }

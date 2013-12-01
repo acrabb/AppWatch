@@ -3,16 +3,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="@dimen/app_cell_size"
                 android:layout_height="@dimen/app_cell_size"
-                android:background="#ff0000"
-                android:layout_margin="5dp"
-                android:padding="10dp"
+                android:padding="5dp"
+                android:background="#8800aaaa"
     >
+                <!--android:background="#ff0000"-->
 
     <ImageView
         android:id="@+id/image"
         android:layout_centerHorizontal="true"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:layout_width="56dp"
         />
     <TextView
         android:id="@+id/title"
@@ -21,6 +21,7 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@id/image"
         android:textSize="20sp"
+        android:textColor="@android:color/primary_text_dark"
         android:text="CHANGEME"
         />
     <TextView
@@ -30,6 +31,7 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@id/title"
         android:textSize="20sp"
+        android:textColor="@android:color/primary_text_dark"
         android:text="CHANGEME"
         />
 

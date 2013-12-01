@@ -2,6 +2,8 @@ package crabb.andre.AppWatch;
 
 import android.app.ActivityManager;
 import android.app.IntentService;
+import android.app.KeyguardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
@@ -16,25 +18,37 @@ import java.util.List;
 public class WatcherService extends IntentService {
 
     private DataController  mDataController = null;
-    private String mLastActivePackageName = null;
+    private String          mLastActivePackageName = null;
     private List<ActivityManager.RunningTaskInfo> taskInfos = null;
     private ActivityManager mActivityManager = null;
+    private int             sessionSeconds = 0;
+    private KeyguardManager mKeyguardManager;
 
     private final int       INTERVAL_SECONDS = 1;
     private final int       INTERVAL_MILLI_SECONDS = INTERVAL_SECONDS * 1000;
     private final String    TAG = "ACAC-SERVICE";
+    private boolean isSetUp = false;
 
 
     // ------------------------------------------------------------------------
     public WatcherService() {
         super("WatcherService");
-        mDataController = DataController.getInstance();
+        mDataController = DataController.getInstance(getApplicationContext());
+        isSetUp = false;
     }
     // ------------------------------------------------------------------------
     @Override
     protected void onHandleIntent(Intent intent) {
-        mActivityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+        if (!isSetUp) {
+            mActivityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+            mKeyguardManager = (KeyguardManager) this.getSystemService(Context.KEYGUARD_SERVICE);
+            isSetUp = true;
+        }
         while (true) {
+            // If screen is locked...don't do anything.
+            if(mKeyguardManager.inKeyguardRestrictedInputMode()) {
+                continue;
+            }
             // Get current class name
             taskInfos = mActivityManager.getRunningTasks(1);
             String packageName = taskInfos.get(0).topActivity.getPackageName();
@@ -59,15 +73,18 @@ public class WatcherService extends IntentService {
     // -- ADD TO DATA ---------------------------------------------------------
     // ------------------------------------------------------------------------
     private void doStuff(String packageName) {
+        Log.d(TAG, ">> DOING STUFF");
         if (packageName == null) {
             Log.d(TAG, "!> Null packageName in doStuff :(");
             return;
         }
         if (!packageName.equals(mLastActivePackageName)) {
+            mDataController.addAppData(mLastActivePackageName, sessionSeconds);
             mLastActivePackageName = packageName;
-            mDataController.incrementTimesOpenedToApp(packageName);
+            sessionSeconds = 0;
+        } else {
+            sessionSeconds++;
         }
-        mDataController.addSecondsToApp(mLastActivePackageName, INTERVAL_SECONDS);
     }
 
     @Override

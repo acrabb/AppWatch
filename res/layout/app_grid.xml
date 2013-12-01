@@ -6,7 +6,8 @@
     android:id="@+id/app_grid"
     android:numColumns="auto_fit"
     android:columnWidth="@dimen/app_cell_size"
-    android:background="#0000bb"
     >
+    <!--android:horizontalSpacing="5dp"-->
+    <!--android:background="#0000bb"-->
 
 </GridView>
