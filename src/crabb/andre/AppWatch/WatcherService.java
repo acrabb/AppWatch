@@ -33,7 +33,7 @@ public class WatcherService extends IntentService {
     // ------------------------------------------------------------------------
     public WatcherService() {
         super("WatcherService");
-        mDataController = DataController.getInstance(getApplicationContext());
+        mDataController = DataController.getInstance(this);
         isSetUp = false;
     }
     // ------------------------------------------------------------------------
@@ -73,18 +73,20 @@ public class WatcherService extends IntentService {
     // -- ADD TO DATA ---------------------------------------------------------
     // ------------------------------------------------------------------------
     private void doStuff(String packageName) {
-        Log.d(TAG, ">> DOING STUFF");
         if (packageName == null) {
             Log.d(TAG, "!> Null packageName in doStuff :(");
             return;
         }
-        if (!packageName.equals(mLastActivePackageName)) {
-            mDataController.addAppData(mLastActivePackageName, sessionSeconds);
-            mLastActivePackageName = packageName;
+        if (!packageName.equals(mLastActivePackageName) && mLastActivePackageName != null) {
+            if (sessionSeconds > 0) {
+                mDataController.addAppData(mLastActivePackageName, sessionSeconds);
+            }
             sessionSeconds = 0;
+            Log.d(TAG, String.format(">> Last package: %s, this package: %s", mLastActivePackageName, packageName));
         } else {
             sessionSeconds++;
         }
+        mLastActivePackageName = packageName;
     }
 
     @Override

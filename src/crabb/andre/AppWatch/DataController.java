@@ -4,12 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
-import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,17 +24,18 @@ import java.util.List;
 public class DataController {
 
     private static DataController instance;
+    private static String TAG = "ACAC-DC";
 
     private SQLiteDatabase mDatabase;
     private MySQLiteHelper dbHelper;
     private String[] allColumns = MySQLiteHelper.allColumns;
-//    private Hashtable<String, CombinedAppData> mDataTable;
+    private Hashtable<String, AppData> mCombinedTable;
 
 
     // -- METHODS -------------------------------------------------------------
     private DataController(Context context) {
-//        mDataTable = new Hashtable<String, AppData>();
         dbHelper = new MySQLiteHelper(context);
+        mCombinedTable = new Hashtable<String, AppData>();
     }
     // ------------------------------------------------------------------------
     public static DataController getInstance(Context context) {
@@ -45,7 +45,7 @@ public class DataController {
         return instance;
     }
     // ------------------------------------------------------------------------
-    public void open() throws SQLException {
+    public void open() {
         mDatabase = dbHelper.getWritableDatabase();
     }
     public void close() {
@@ -56,6 +56,7 @@ public class DataController {
         values.put(MySQLiteHelper.COLUMN_PACKAGE_NAME, packageName);
         values.put(MySQLiteHelper.COLUMN_TIMESTAMP, System.currentTimeMillis());
         values.put(MySQLiteHelper.COLUMN_NUM_SECONDS, seconds);
+        open();
         long insertId = mDatabase.insert(MySQLiteHelper.TABLE_APPS, null, values);
         Cursor cursor = mDatabase.query(MySQLiteHelper.TABLE_APPS,
                                         allColumns,
@@ -64,12 +65,17 @@ public class DataController {
         cursor.moveToFirst();
         AppData appData = cursorToAppData(cursor);
         cursor.close();
+        close();
         return appData;
     }
 
     private AppData cursorToAppData(Cursor cursor) {
+        String name = cursor.getString(cursor.getColumnIndexOrThrow(MySQLiteHelper.COLUMN_PACKAGE_NAME));
+        if (name == null) {
+            return null;
+        }
         AppData appData =
-            new AppData(cursor.getString(cursor.getColumnIndexOrThrow(MySQLiteHelper.COLUMN_PACKAGE_NAME)),
+            new AppData(name,
                     cursor.getLong(cursor.getColumnIndexOrThrow(MySQLiteHelper.COLUMN_TIMESTAMP)),
                     cursor.getLong(cursor.getColumnIndexOrThrow(MySQLiteHelper.COLUMN_NUM_SECONDS))
                     );
@@ -77,67 +83,66 @@ public class DataController {
         return appData;
     }
 
-    /*
-        This aggregates all the rows in the database for a certain app
-        into one object.
-     */
-    /*
-    public ArrayList<CombinedAppData> getCombinedAppDatas() {
-        // TODO
-        Cursor cursor = mDatabase.query(MySQLiteHelper.TABLE_APPS,
-            allColumns, null, null, null, null, null);
-        cursor.moveToFirst();
-        CombinedAppData cad = null;
-        while(!cursor.isAfterLast()) {
-            cad = getOrCreateData(cursor.getString(cursor.getColumnIndexOrThrow(MySQLiteHelper.COLUMN_PACKAGE_NAME)));
-            cad.addSeconds(cursor.getColumnIndexOrThrow(MySQLiteHelper.COLUMN_NUM_SECONDS));
-            cad.incrementTimesOpened();
-        }
-    }
 
-    // Returns the AppData obect for the given 'packageName'.
-    //  Creates it of necessary.
-    public AppData getOrCreateData(String packageName) {
-        AppData retVal;
-        if (!mDataTable.containsKey(packageName)) {
-            retVal = new AppData(packageName);
-            mDataTable.put(packageName, retVal);
-        }
-        return mDataTable.get(packageName);
-    }
-
-
-    // -- ADD TO CAD class ----------------------------------------------------------------------
-    public boolean addSecondsToApp(String packageName, int seconds) {
-        if (packageName == null) {
-            return false;
-        }
-        return getOrCreateData(packageName).addSeconds(seconds);
-    }
-*/
 
     public ArrayList<AppData> getAppDatas() {
         ArrayList<AppData> datas = new ArrayList<AppData>();
+        open();
         Cursor cursor = mDatabase.query(MySQLiteHelper.TABLE_APPS,
                     allColumns, null, null, null, null, null);
 
         cursor.moveToFirst();
         while(!cursor.isAfterLast()) {
-            datas.add(this.cursorToAppData(cursor));
+            datas.add(cursorToAppData(cursor));
             cursor.moveToNext();
         }
         cursor.close();
+        close();
+        Log.i(TAG, ">> Returning app datas: " + datas);
         return datas;
     }
+
+
     /*
-        // ------------------------------------------------------------------------
-        public boolean incrementTimesOpenedToApp(String packageName) {
-            if (packageName == null) {
-                return false;
+        This aggregates all the rows in the database for a certain app
+        into one object.
+     */
+    public Collection<AppData> getCombinedAppDatas() {
+        mCombinedTable.clear();
+        open();
+        Cursor cursor = mDatabase.query(MySQLiteHelper.TABLE_APPS,
+                allColumns, null, null, null, null, null);
+        cursor.moveToFirst();
+        AppData ad = null;
+        String adName;
+        while(!cursor.isAfterLast()) {
+            adName = cursor.getString(cursor.getColumnIndexOrThrow(MySQLiteHelper.COLUMN_PACKAGE_NAME));
+            if (adName == null) {
+                Log.e(TAG, "!> Null name from cursor.");
+                break;
             }
-            return getOrCreateData(packageName).incrementTimesOpened();
+            ad = getOrCreateData(adName, mCombinedTable);
+            ad.addSeconds((int) cursor.getLong(cursor.getColumnIndexOrThrow(MySQLiteHelper.COLUMN_NUM_SECONDS)));
+            ad.incrementTimesOpened();
+            cursor.moveToNext();
         }
-        // ------------------------------------------------------------------------
-        // ------------------------------------------------------------------------
-    */
+        cursor.close();
+        close();
+        return mCombinedTable.values();
+    }
+
+    // Returns the AppData obect for the given 'packageName'.
+    //  Creates it of necessary.
+    public AppData getOrCreateData(String packageName, Hashtable<String, AppData> ht) {
+        if (packageName == null) {
+            return null;
+        }
+        AppData retVal;
+        if (!ht.containsKey(packageName)) {
+            retVal = new AppData(packageName);
+            ht.put(packageName, retVal);
+        }
+        return ht.get(packageName);
+    }
+
 }

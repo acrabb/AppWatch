@@ -33,8 +33,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + TABLE_APPS + "( "
             + COLUMN_ID + " integer primary key autoincrement, "
             + COLUMN_PACKAGE_NAME + " text, "
-            + COLUMN_TIMESTAMP + " integer (long), "
-            + COLUMN_NUM_SECONDS + " integer (long)"
+            + COLUMN_TIMESTAMP + " long, "
+            + COLUMN_NUM_SECONDS + " long"
             + " );";
 
 

@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.*;
 
+import java.util.ArrayList;
+
 public class MainActivity extends Activity {
 
     final String            TAG = "ACACACAC";
@@ -57,8 +59,8 @@ public class MainActivity extends Activity {
             }
         });
         mAppAdapter = new AppDataAdapter(getApplicationContext(),
-                                                R.layout.app_cell,
-                                                mDataController.getAppDatas());
+                            R.layout.app_cell,
+                            new ArrayList<AppData>(mDataController.getCombinedAppDatas()));
         mAppGrid.setAdapter(mAppAdapter);
         // Set View to update every second.
     }

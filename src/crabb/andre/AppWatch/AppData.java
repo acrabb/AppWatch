@@ -20,17 +20,31 @@ public class AppData implements Comparable {
     private long        mId;
     private long        mTimestamp;
     private String      mPackageName;
-    private long         mSeconds;
+    private long        mSeconds;
+    private int         mTimesOpened;
 
 
     final String    TAG = "ACAC-AppData";
 
     // -- Contructors ---------------------------------------------------------
+    public AppData (String packageName) {
+        this.mPackageName = packageName;
+        this.mTimestamp = 0;
+        this.mSeconds   = 0;
+        this.mTimesOpened = 0;
+    }
     // ------------------------------------------------------------------------
     public AppData (String packageName, long timestamp, long seconds) {
         this.mPackageName   = packageName;
         this.mTimestamp     = timestamp;
         this.mSeconds       = seconds;
+    }
+
+    public void addSeconds(int seconds) {
+        this.mSeconds += seconds;
+    }
+    public void incrementTimesOpened() {
+        this.mTimesOpened++;
     }
 
     // -- GETTERS & SETTERS ---------------------------------------------------
@@ -65,7 +79,7 @@ public class AppData implements Comparable {
     @Override
     public int compareTo(Object o) {
         AppData other = (AppData) o;
-        return (this.mTimestamp < other.getTimestamp()) ? -1 :
-                (this.mTimestamp == other.getTimestamp() ? 0 : 1);
+        return (this.mSeconds < other.getSeconds()) ? -1 :
+                (this.mSeconds == other.getSeconds() ? 0 : 1);
     }
 }

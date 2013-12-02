@@ -9,6 +9,9 @@ package crabb.andre.AppWatch;
  */
 public class Utils {
 
+    public final static String LAUNCHER = "com.android.launcher";
+    public final static String SYSTEM_UI = "com.android.systemui";
+
 
     private final static int SECOND    = 1;
     private final static int MINUTE    = 60 * SECOND;

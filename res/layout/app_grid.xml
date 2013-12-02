@@ -7,7 +7,5 @@
     android:numColumns="auto_fit"
     android:columnWidth="@dimen/app_cell_size"
     >
-    <!--android:horizontalSpacing="5dp"-->
-    <!--android:background="#0000bb"-->
 
 </GridView>

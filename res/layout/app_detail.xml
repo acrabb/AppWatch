@@ -12,13 +12,25 @@
         android:text="CHANGEME"
         android:textSize="40dp"
         />
-    <ImageView
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:id="@+id/graphImage"
-        android:background="@drawable/graph"
-        android:layout_margin="20dp"
-        />
+    <!--<ImageView-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:id="@+id/graphImage"-->
+        <!--android:background="@drawable/graph"-->
+        <!--android:layout_margin="20dp"-->
+        <!--/>-->
+
+    <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/header"
+            android:layout_above="@id/footer"
+            android:fillViewport="true"
+            >
+        <include layout="@layout/data_list"/>
+    </ScrollView>
+
     <Button
         android:layout_height="wrap_content"
         android:layout_width="400dp"
