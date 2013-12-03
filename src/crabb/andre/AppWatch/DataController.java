@@ -8,6 +8,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
 
 /**
@@ -48,9 +49,11 @@ public class DataController {
     public void open() {
         mDatabase = dbHelper.getWritableDatabase();
     }
+    // ------------------------------------------------------------------------
     public void close() {
         dbHelper.close();
     }
+    // ------------------------------------------------------------------------
     public AppData addAppData(String packageName, int seconds) {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_PACKAGE_NAME, packageName);
@@ -69,6 +72,7 @@ public class DataController {
         return appData;
     }
 
+    // ------------------------------------------------------------------------
     private AppData cursorToAppData(Cursor cursor) {
         String name = cursor.getString(cursor.getColumnIndexOrThrow(MySQLiteHelper.COLUMN_PACKAGE_NAME));
         if (name == null) {
@@ -85,11 +89,29 @@ public class DataController {
 
 
 
-    public ArrayList<AppData> getAppDatas() {
+
+    /*
+     * Get all rows and all columns
+     */
+    public ArrayList<AppData> getAppDatasAll() {
+        return makeQuery(null, null);
+    }
+    // ------------------------------------------------------------------------
+    public ArrayList<AppData> getAppDatasWithName(String packageName) {
+        return makeQuery("package_name = ?", new String[]{packageName});
+    }
+    // ------------------------------------------------------------------------
+    public ArrayList<AppData> getAppDatasWithNameFromDate(String packageName, long dateInMs) {
+        String dateString = String.format("%d", dateInMs);
+        return makeQuery("package_name = ? and (timestamp > ?)", new String[] {packageName, dateString});
+    }
+    // ------------------------------------------------------------------------
+    private ArrayList<AppData> makeQuery(String query, String[] params) {
         ArrayList<AppData> datas = new ArrayList<AppData>();
         open();
-        Cursor cursor = mDatabase.query(MySQLiteHelper.TABLE_APPS,
-                    allColumns, null, null, null, null, null);
+        Log.i(TAG, String.format("DC> Making query '%s' with params: %s", query, params));
+        Cursor cursor = mDatabase.query(MySQLiteHelper.TABLE_APPS, allColumns,
+                                        query, params, null, null, null);
 
         cursor.moveToFirst();
         while(!cursor.isAfterLast()) {
@@ -99,6 +121,7 @@ public class DataController {
         cursor.close();
         close();
         Log.i(TAG, ">> Returning app datas: " + datas);
+        Collections.reverse(datas);
         return datas;
     }
 

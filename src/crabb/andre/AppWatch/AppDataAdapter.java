@@ -23,6 +23,7 @@ import java.util.Collections;
  */
 public class AppDataAdapter extends ArrayAdapter<AppData> {
 
+
     private int                 resourceId;
     private Context             context;
     private AppData             app;

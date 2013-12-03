@@ -4,6 +4,7 @@
       android:orientation="vertical"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
+      android:id="@+id/detail_layout"
       >
     <TextView
         android:layout_height="wrap_content"
@@ -20,43 +21,22 @@
         <!--android:layout_margin="20dp"-->
         <!--/>-->
 
+    <com.echo.holographlibrary.LineGraph
+            android:layout_height="400dp"
+            android:layout_width="wrap_content"
+            android:id="@+id/line_graph"
+         />
+
     <ScrollView
             android:id="@+id/scrollView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/header"
-            android:layout_above="@id/footer"
             android:fillViewport="true"
+            android:visibility="gone"
             >
         <include layout="@layout/data_list"/>
     </ScrollView>
 
-    <Button
-        android:layout_height="wrap_content"
-        android:layout_width="400dp"
-        android:text="Last Week"
-        android:textSize="20sp"
-        android:id="@+id/week"
-        android:layout_margin="10dp"
-        android:layout_gravity="center_horizontal"
-        />
-    <Button
-        android:layout_height="wrap_content"
-        android:layout_width="400dp"
-        android:text="Last Month"
-        android:textSize="20sp"
-        android:id="@+id/month"
-        android:layout_margin="10dp"
-        android:layout_gravity="center_horizontal"
-        />
-    <Button
-        android:layout_height="wrap_content"
-        android:layout_width="400dp"
-        android:text="Last Year"
-        android:textSize="20sp"
-        android:id="@+id/year"
-        android:layout_margin="10dp"
-        android:layout_gravity="center_horizontal"
-        />
+   <!-- Buttons added here programatically -->
 
 </LinearLayout>

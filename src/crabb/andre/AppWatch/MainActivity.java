@@ -75,6 +75,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();    //To change body of overridden methods use File | Settings | File Templates.
         Log.d(TAG, ">> APP ON RESUME!");
+        mDataController.getCombinedAppDatas();
         mAppAdapter.notifyDataSetChanged();
 //        updateView();
     }
