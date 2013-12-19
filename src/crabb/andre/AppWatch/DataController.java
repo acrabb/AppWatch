@@ -124,10 +124,8 @@ public class DataController {
         Collections.reverse(datas);
         return datas;
     }
-
-
     /*
-        This aggregates all the rows in the database for a certain app
+        This aggregates all the rows in the database for each app
         into one object.
      */
     public Collection<AppData> getCombinedAppDatas() {
@@ -138,6 +136,9 @@ public class DataController {
         cursor.moveToFirst();
         AppData ad = null;
         String adName;
+
+        int totalUsageSeconds = 0;
+        int tempSec = 0;
         while(!cursor.isAfterLast()) {
             adName = cursor.getString(cursor.getColumnIndexOrThrow(MySQLiteHelper.COLUMN_PACKAGE_NAME));
             if (adName == null) {
@@ -145,14 +146,21 @@ public class DataController {
                 break;
             }
             ad = getOrCreateData(adName, mCombinedTable);
-            ad.addSeconds((int) cursor.getLong(cursor.getColumnIndexOrThrow(MySQLiteHelper.COLUMN_NUM_SECONDS)));
+            tempSec = (int) cursor.getLong(cursor.getColumnIndexOrThrow(MySQLiteHelper.COLUMN_NUM_SECONDS));
+            ad.addSeconds(tempSec);
+            totalUsageSeconds += tempSec;
             ad.incrementTimesOpened();
             cursor.moveToNext();
         }
         cursor.close();
         close();
-        return mCombinedTable.values();
+        ad = new AppData(Utils.OVERALL);
+        ad.addSeconds(totalUsageSeconds);
+        Collection<AppData> vals = mCombinedTable.values();
+        vals.add(ad);
+        return vals;
     }
+
 
     // Returns the AppData obect for the given 'packageName'.
     //  Creates it of necessary.

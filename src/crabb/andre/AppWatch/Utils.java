@@ -20,6 +20,7 @@ public class Utils {
     private final static int WEEK      = 7 * DAY;
     private final static int MONTH     = 31 * DAY;
     private final static int YEAR      = 12 * MONTH;
+    public static final String OVERALL = "Overall Usage";
 
     public static String secondsToClockTimeString(long seconds) {
         int hours = (int) (seconds / HOUR);
